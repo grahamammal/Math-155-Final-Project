@@ -9,3 +9,39 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(readr)
+library(dplyr)
+```
+
+Function to make table from downloaded csv
+```{r}
+makeTable<-function(file_path){
+   this_table<-read_csv(file_path, skip=2)
+   colnames(this_table)[7]<-this_table$`Indicator Name`[1]
+   colnames(this_table)[3]="Country_Code"
+
+   this_table<-this_table %>% 
+      select(2:7)
+   this_table
+}
+
+
+```
+
+Creates a list of all the tables
+```{r, warning=FALSE, message=FALSE}
+filenames <- list.files(pattern="*.csv", full.names=TRUE)
+all_tables <- lapply(filenames, makeTable)
+```
+
+Joins all tables together
+```{r}
+joined_tables<-all_tables[[1]]
+for(i in 2:length(all_tables)){
+      joined_tables<-full_join(joined_tables, all_tables[[i]], by=c("Region", "Country_Code","Country", "Year", "Sex"))
+}
+```
+
+
+
