@@ -43,5 +43,86 @@ for(i in 2:length(all_tables)){
 }
 ```
 
+```{r}
+filtered<-joined_tables %>%
+   filter(!is.na(`Life expectancy at age 60  by sex`))
+
+sample_tables<-full_join(all_tables[[1]], all_tables[[2]])
+
+na_count <-sapply(all_tables, function(y) nrow(y))
+na_count
+na.omit(sample_tables)
+
+
+
+```
+
+```{r}
+results=list() 
+for(i in 1:length(all_tables)){
+   if(nrow(all_tables[[i]])>3500){
+      results[[length(results)+1]]=all_tables[[i]]
+   }
+}
+
+joined_results<-results[[1]]
+for(i in 2:length(results)){
+      joined_results<-full_join(joined_results, results[[i]], by=c("Region", "Country_Code","Country", "Year", "Sex"))
+}
+
+joined_results
+na.omit(joined_results)
+```
+
+Gapminder data
+```{r}
+library(tidyr)
+
+filenames <- list.files(path="GapMinderData",pattern="*.csv", full.names=TRUE)
+contraceptive<-read_csv(filenames[[1]])
+
+nchar(filenames[[1]])
+
+(name<-substring(filenames[[1]], 15, nchar(filenames[[1]])-4))
+contraceptive<-contraceptive %>% 
+   gather(key=year, value=temp, 2:length(contraceptive))
+colnames(contraceptive)[1]<-"country"
+colnames(contraceptive)[3]<-name
+contraceptive[contraceptive == 0] <- NA
+head(contraceptive)
+```
+
+```{r}
+makeGapMinderTable<-function(file_path){
+   table<-read_csv(file_path)
+   name<-substring(file_path, 15, nchar(file_path)-4)
+   table<-table %>% 
+      gather(key=year, value=temp, 2:length(table))
+   table
+   colnames(table)[1]<-"country"
+   colnames(table)[3]<-name
+   table[table == 0] <- NA
+   table
+}
+```
+
+```{r}
+allGapminderTables<-lapply(filenames, makeGapMinderTable)
+```
+
+```{r}
+joined_Gapminder_tables<-allGapminderTables[[1]]
+for(i in 2:length(allGapminderTables)){
+      joined_Gapminder_tables<-full_join(joined_Gapminder_tables, allGapminderTables[[i]], by=c("country", "year"))
+}
+
+dim(joined_Gapminder_tables)
+na.omit(joined_Gapminder_tables)
+```
+
+
+
+
+
 
 
