@@ -111,13 +111,34 @@ allGapminderTables<-lapply(filenames, makeGapMinderTable)
 ```
 
 ```{r}
+head(na_free_table)
+
+```
+
+
+```{r}
+library(ggplot2)
 joined_Gapminder_tables<-allGapminderTables[[1]]
 for(i in 2:length(allGapminderTables)){
       joined_Gapminder_tables<-full_join(joined_Gapminder_tables, allGapminderTables[[i]], by=c("country", "year"))
 }
 
+joined_Gapminder_tables<-joined_Gapminder_tables %>% 
+   select(-age_at_1st_marriage_women)
+
 dim(joined_Gapminder_tables)
-na.omit(joined_Gapminder_tables)
+na_free_table<-na.omit(joined_Gapminder_tables)
+table(na_free_table$country)
+table(na_free_table$year)
+
+na_free_table %>%
+   group_by(year) %>% 
+   filter( females_aged_15plus_unemployment_rate_percent/males_aged_15plus_unemployment_rate_percent<20,n()>5) %>% 
+   ggplot(aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_female, color=year))+
+   geom_point()+
+   geom_smooth(method="lm")
+
+#change
 ```
 
 
