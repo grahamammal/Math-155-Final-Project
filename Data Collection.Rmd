@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "Data Collection"
 author: "Ellen Graham"
@@ -12,67 +13,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(readr)
 library(dplyr)
+library(ggplot2)
+library(knitr)
+library(broom)
 ```
 
-Function to make table from downloaded csv
-```{r}
-makeTable<-function(file_path){
-   this_table<-read_csv(file_path, skip=2)
-   colnames(this_table)[7]<-this_table$`Indicator Name`[1]
-   colnames(this_table)[3]="Country_Code"
 
-   this_table<-this_table %>% 
-      select(2:7)
-   this_table
-}
-
-
-```
-
-Creates a list of all the tables
-```{r, warning=FALSE, message=FALSE}
-filenames <- list.files(pattern="*.csv", full.names=TRUE)
-all_tables <- lapply(filenames, makeTable)
-```
-
-Joins all tables together
-```{r}
-joined_tables<-all_tables[[1]]
-for(i in 2:length(all_tables)){
-      joined_tables<-full_join(joined_tables, all_tables[[i]], by=c("Region", "Country_Code","Country", "Year", "Sex"))
-}
-```
-
-```{r}
-filtered<-joined_tables %>%
-   filter(!is.na(`Life expectancy at age 60  by sex`))
-
-sample_tables<-full_join(all_tables[[1]], all_tables[[2]])
-
-na_count <-sapply(all_tables, function(y) nrow(y))
-na_count
-na.omit(sample_tables)
-
-
-
-```
-
-```{r}
-results=list() 
-for(i in 1:length(all_tables)){
-   if(nrow(all_tables[[i]])>3500){
-      results[[length(results)+1]]=all_tables[[i]]
-   }
-}
-
-joined_results<-results[[1]]
-for(i in 2:length(results)){
-      joined_results<-full_join(joined_results, results[[i]], by=c("Region", "Country_Code","Country", "Year", "Sex"))
-}
-
-joined_results
-na.omit(joined_results)
-```
 
 Gapminder data
 ```{r}
@@ -110,14 +56,9 @@ makeGapMinderTable<-function(file_path){
 allGapminderTables<-lapply(filenames, makeGapMinderTable)
 ```
 
-```{r}
-head(na_free_table)
-
-```
 
 
 ```{r}
-library(ggplot2)
 joined_Gapminder_tables<-allGapminderTables[[1]]
 for(i in 2:length(allGapminderTables)){
       joined_Gapminder_tables<-full_join(joined_Gapminder_tables, allGapminderTables[[i]], by=c("country", "year"))
@@ -128,22 +69,187 @@ joined_Gapminder_tables<-joined_Gapminder_tables %>%
 
 dim(joined_Gapminder_tables)
 na_free_table<-na.omit(joined_Gapminder_tables)
-table(na_free_table$country)
-table(na_free_table$year)
 
-na_free_table %>%
-   group_by(year) %>% 
-   filter( females_aged_15plus_unemployment_rate_percent/males_aged_15plus_unemployment_rate_percent<20,n()>5) %>% 
-   ggplot(aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_female, color=year))+
-   geom_point()+
-   geom_smooth(method="lm")
+```
 
-#change
+```{r}
+kable(table(na_free_table$country))
+kable(table(na_free_table$year))
+
 ```
 
 
 
 
 
+```{r}
+head(na_free_table)
+names(joined_Gapminder_tables)
+```
+
+```{r}
+#alldata.lm<-joined_Gapminder_tables %>% lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49+
+                     #females_aged_15plus_unemployment_rate_percent+
+                     #mean_years_in_school_women_percent_men_25_to_34_years+
+                     #ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+country, data=.)
 
 
+```
+
+#Visualizations of Data
+
+##Colored by year
+```{r}
+class(joined_Gapminder_tables$year)
+
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot()+
+   geom_point(aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_female, color=as.numeric(year)))+
+   scale_color_gradient(limits=c(1970, 2015))+
+   geom_smooth(data=joined_Gapminder_tables, aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_female, fill=year), method="lm", se=FALSE)+
+   theme(legend.position="none")
+```
+
+```{r}
+alldata.lm<-joined_Gapminder_tables %>% 
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49*year, data=.)
+
+tidy(summary(alldata.lm))
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=females_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, color=year))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+#change
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=males_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, color=year))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+#change
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5, females_aged_15plus_unemployment_rate_percent/males_aged_15plus_unemployment_rate_percent<20) %>% 
+   ggplot(aes(x=females_aged_15plus_unemployment_rate_percent/males_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, color=year))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+#change
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=mean_years_in_school_women_percent_men_25_to_34_years, y=life_expectancy_female, color=year))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=ratio_of_girls_to_boys_in_primary_and_secondary_education_perc, y=life_expectancy_female, color=year))+
+   geom_point()+
+   geom_smooth(method="lm")
+
+```
+
+##Colored by country
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_female, color=country))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+#change
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=females_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, color=country))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+#change
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=males_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, color=country))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+#change
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5, females_aged_15plus_unemployment_rate_percent/males_aged_15plus_unemployment_rate_percent<20) %>% 
+   ggplot(aes(x=females_aged_15plus_unemployment_rate_percent/males_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, color=country))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+#change
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=mean_years_in_school_women_percent_men_25_to_34_years, y=life_expectancy_female, color=country))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+```
+
+```{r}
+joined_Gapminder_tables %>%
+   group_by(year) %>% 
+   filter(n()>5) %>% 
+   ggplot(aes(x=ratio_of_girls_to_boys_in_primary_and_secondary_education_perc, y=life_expectancy_female, color=country))+
+   geom_point()+
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
+
+```
+
+
+
+
+>>>>>>> 61ccb208c38d46cbf9e958e2c74d333c93b25f2c
