@@ -8,6 +8,10 @@ output: html_document
 
 Suggestions From Brianna:
 
+Possibly use difference or ratio of life expectancies 
+Try doing both of them.
+(Ratio if years more valuable younger or later)
+
 Make different Models for different years
 
 Find which variables missing (culprits for sparse data)
