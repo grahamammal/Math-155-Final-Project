@@ -6,6 +6,20 @@ date: "November 4, 2018"
 output: html_document
 ---
 
+Suggestions From Brianna:
+
+Make different Models for different years
+
+Find which variables missing (culprits for sparse data)
+Inputting missing data for ~5 year chunks
+
+Making maps of single vars (could even do through years! finally learn rshiny?)
+(Which countries aren't there)
+Brianna expects China and India
+
+Try to model missing data for large missing countries (economic and health factors, maybe realted to gender to get a sense of what it might be based on relationships in countries of similar development levels)
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -112,22 +126,22 @@ dim(joined_Gapminder_tables)
 dim(na.omit(joined_Gapminder_tables))
 names(joined_Gapminder_tables)
 
-lm.everything<-lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49+
+lm.numerical<-lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49+
                      males_aged_15plus_unemployment_rate_percent+
                      ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+
                      females_aged_15plus_unemployment_rate_percent+
                      mean_years_in_school_women_percent_men_25_to_34_years, 
                   data=joined_Gapminder_tables)
 
-summary(lm.everything)
+summary(lm.numerical)
 ```
 
 ```{r, fig.width=10, fig.height=10}
-avPlots(lm.everything)
+avPlots(lm.numerical)
 ```
 
 ```{r}
-augment(lm.everything, data=joined_Gapminder_tables) %>% 
+augment(lm.numerical, data=joined_Gapminder_tables) %>% 
    ggplot(aes(x=.fitted, y=.resid))+
    geom_point()+
    geom_hline(yintercept = 0)+
