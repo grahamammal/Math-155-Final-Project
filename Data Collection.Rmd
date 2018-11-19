@@ -16,13 +16,16 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
 library(broom)
+library(car)
+library(tidyr)
+library(qqplotr)
+library(GGally)
 ```
 
 
 
 Gapminder data
 ```{r}
-library(tidyr)
 
 filenames <- list.files(path="GapMinderData",pattern="*.csv", full.names=TRUE)
 contraceptive<-read_csv(filenames[[1]])
@@ -98,6 +101,110 @@ names(joined_Gapminder_tables)
 
 #Visualizations of Data
 
+##
+```{r, fig.width=13, fig.height=13}
+joined_Gapminder_tables %>% 
+   ggpairs(columns=3:9)
+```
+
+```{r}
+dim(joined_Gapminder_tables)
+dim(na.omit(joined_Gapminder_tables))
+names(joined_Gapminder_tables)
+
+lm.everything<-lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49+
+                     males_aged_15plus_unemployment_rate_percent+
+                     ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+
+                     females_aged_15plus_unemployment_rate_percent+
+                     mean_years_in_school_women_percent_men_25_to_34_years, 
+                  data=joined_Gapminder_tables)
+
+summary(lm.everything)
+```
+
+```{r, fig.width=10, fig.height=10}
+avPlots(lm.everything)
+```
+
+```{r}
+augment(lm.everything, data=joined_Gapminder_tables) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+```{r}
+
+```
+
+
+##Histograms!
+
+```{r}
+head(joined_Gapminder_tables)
+```
+
+Years
+```{r}
+joined_Gapminder_tables %>% 
+   ggplot() + 
+   geom_histogram(aes(x=as.numeric(year)))
+```
+
+Contraceptive Use
+
+```{r}
+joined_Gapminder_tables %>% 
+   ggplot(aes(x=contraceptive_use_percent_of_women_ages_15_49))+
+   geom_histogram()
+```
+
+Females unemployment rate
+```{r}
+joined_Gapminder_tables %>% 
+   ggplot(aes(x=females_aged_15plus_unemployment_rate_percent))+
+   geom_histogram()
+```
+
+Males unemployment rate
+```{r}
+joined_Gapminder_tables %>% 
+   ggplot(aes(x=males_aged_15plus_unemployment_rate_percent))+
+   geom_histogram()
+```
+
+life Expectancy Female
+
+```{r}
+
+joined_Gapminder_tables %>% 
+   ggplot(aes(x=life_expectancy_female))+
+   geom_histogram()
+
+```
+
+Life Expectancy Male
+```{r}
+joined_Gapminder_tables %>% 
+   ggplot(aes(x=life_expectancy_male))+
+   geom_histogram()
+```
+
+Years in school
+```{r}
+joined_Gapminder_tables %>% 
+   ggplot(aes(x=mean_years_in_school_women_percent_men_25_to_34_years))+
+   geom_histogram()
+```
+
+Ratio of girls to boys primary+secondary education
+```{r}
+joined_Gapminder_tables %>% 
+   ggplot(aes(x=ratio_of_girls_to_boys_in_primary_and_secondary_education_perc))+
+   geom_histogram()
+```
+
 ##Colored by year
 ```{r}
 class(joined_Gapminder_tables$year)
@@ -119,18 +226,27 @@ alldata.lm<-joined_Gapminder_tables %>%
    lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49*year, data=.)
 
 tidy(summary(alldata.lm))
+
+temp<-joined_Gapminder_tables %>% 
+   filter(!is.na(contraceptive_use_percent_of_women_ages_15_49), !is.na(life_expectancy_female))
+cor(x=temp$contraceptive_use_percent_of_women_ages_15_49, y=temp$life_expectancy_female)
 ```
 
 ```{r}
 joined_Gapminder_tables %>%
    group_by(year) %>% 
    filter(n()>5) %>% 
-   ggplot(aes(x=females_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, color=as.numeric(year)))+
+   ggplot()+
+   geom_point(aes(x=females_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, color=as.numeric(year)))+
    scale_color_gradient(limits=c(1970, 2015))+
    geom_smooth(data=joined_Gapminder_tables, aes(x=females_aged_15plus_unemployment_rate_percent, y=life_expectancy_female, fill=year), method="lm", se=FALSE)+
    theme(legend.position="none")
 
 #change
+
+temp<-joined_Gapminder_tables %>% 
+   filter(!is.na(females_aged_15plus_unemployment_rate_percent), !is.na(life_expectancy_female))
+cor(x=temp$females_aged_15plus_unemployment_rate_percent, y=temp$life_expectancy_female)
 ```
 
 ```{r}
@@ -169,12 +285,20 @@ joined_Gapminder_tables %>%
 ```
 
 ```{r}
+temp<-joined_Gapminder_tables %>% 
+   filter(!is.na(mean_years_in_school_women_percent_men_25_to_34_years), !is.na(life_expectancy_female))
+cor(x=temp$mean_years_in_school_women_percent_men_25_to_34_years, y=temp$life_expectancy_female)
+```
+
+
+```{r}
 joined_Gapminder_tables %>%
    group_by(year) %>% 
    filter(n()>5) %>% 
    ggplot(aes(x=ratio_of_girls_to_boys_in_primary_and_secondary_education_perc, y=life_expectancy_female, color=year))+
    geom_point()+
-   geom_smooth(method="lm")
+   geom_smooth(method="lm")+
+   theme(legend.position="none")
 
 ```
 
