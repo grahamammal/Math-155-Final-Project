@@ -101,25 +101,101 @@ kable(table(na_free_table$year))
 
 
 
+Cleaning data
+```{r}
+clean_gapminder_tables<-joined_Gapminder_tables %>% 
+   filter_at(vars(c(3:9)), any_vars(!is.na(.))) %>% 
+   arrange(year)
+
+cols.num<-c(2:9)
+clean_gapminder_tables[cols.num] <- sapply(clean_gapminder_tables[cols.num],as.numeric)
+```
+
+Inputting missing data
+
+
+
 
 
 ```{r}
-head(na_free_table)
-names(joined_Gapminder_tables)
+inputted_gapminder<-data.frame()
+for(i in 0:30){
+   five_years<-clean_gapminder_tables %>% 
+      filter(1950+5*i-2<=year & year<=1950+5*i+2) %>% 
+      mutate(year=1950+5*i) %>% 
+      group_by(country, year) %>% 
+      summarise_at(vars(c(3:9)), any_vars(mean(., na.rm=TRUE)))
+
+   inputted_gapminder<-rbind.data.frame(inputted_gapminder, five_years)   
+}
+
+na_free_inputted<-ungroup(na.omit(inputted_gapminder))
 ```
 
-```{r}
-#alldata.lm<-joined_Gapminder_tables %>% lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49+
-                     #females_aged_15plus_unemployment_rate_percent+
-                     #mean_years_in_school_women_percent_men_25_to_34_years+
-                     #ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+country, data=.)
 
-
-```
 
 #Visualizations of Data
 
-##
+##Choropleths
+
+```{r}
+library(sf)
+
+
+sfpath<-"Shapefiles\\TM_WORLD_BORDERS-0.3\\TM_WORLD_BORDERS-0.3.shp"
+
+countries <- st_read(sfpath, quiet = TRUE)
+
+```
+
+```{r}
+
+as_tibble(countries)
+
+as_tibble(countries %>% arrange(NAME))
+
+
+na_free_inputted<-na_free_inputted %>% 
+   mutate(country=dplyr::recode(country, 'South Korea'='Korea, Republic of',
+   "Lao"="Lao People's Democratic Republic", 
+   "St. Vincent and the Grenadines"="Saint Vincent and the Grenadines", 
+   "Syria"="Syrian Arab Republic",
+   "Iran"="Iran (Islamic Republic of)",
+   "Congo, Dem. Rep."="Democratic Republic of the Congo",
+   "Congo, Rep."="Congo",
+   "Kyrgyz Republic"="Kyrgyzstan",
+   "Macedonia, FYR"="The former Yugoslav Republic of Macedonia", 
+   "Moldova"="Republic of Moldova",
+   "Myanmar"="Burma",
+   "Slovak Republic"="Slovakia",
+   "St. Lucia"="Saint Lucia",
+   "Tanzania"="United Republic of Tanzania",
+   "Vietnam"="Viet Nam"
+   ))
+
+
+
+sf_na_free_inputted<-countries %>% 
+   right_join(na_free_inputted, by=c("NAME"= "country")) %>% 
+   arrange(NAME)
+
+as_tibble(sf_na_free_inputted)
+```
+
+Simple features map
+```{r, fig.width=10, fig.height=5}
+library(viridis)
+
+sf_na_free_inputted %>% 
+   filter(year==2005) %>% 
+   ggplot() +
+   scale_fill_viridis("Female life expectancy")+
+   geom_sf(aes(fill = life_expectancy_female)) +
+   ggtitle("Life Expectancy 2005")
+```
+
+
+##ggpairs
 ```{r, fig.width=13, fig.height=13}
 joined_Gapminder_tables %>% 
    ggpairs(columns=3:9)
