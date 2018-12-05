@@ -9,7 +9,7 @@ output: html_document
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE)
 ```
 
 ```{r}
@@ -76,14 +76,6 @@ dim(joined_Gapminder_tables)
 na_free_table<-na.omit(joined_Gapminder_tables)
 
 ```
-
-```{r}
-kable(table(na_free_table$country))
-kable(table(na_free_table$year))
-
-```
-
-
 
 Cleaning data
 ```{r}
