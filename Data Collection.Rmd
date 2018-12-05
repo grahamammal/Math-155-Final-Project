@@ -6,22 +6,6 @@ date: "November 4, 2018"
 output: html_document
 ---
 
-Suggestions From Brianna:
-
-Possibly use difference or ratio of life expectancies 
-Try doing both of them.
-(Ratio if years more valuable younger or later)
-
-Make different Models for different years
-
-Find which variables missing (culprits for sparse data)
-Inputting missing data for ~5 year chunks
-
-Making maps of single vars (could even do through years! finally learn rshiny?)
-(Which countries aren't there)
-Brianna expects China and India
-
-Try to model missing data for large missing countries (economic and health factors, maybe realted to gender to get a sense of what it might be based on relationships in countries of similar development levels)
 
 
 ```{r setup, include=FALSE}
@@ -543,12 +527,7 @@ inputted_gapminder %>%
 
 
 
-Model building plan:
--Look into interaction terms using model comparison tests
--See how models are differnt for different years
--Compare life expectancy ratio and life expectency difference to variation across countries
--Find which variables are predictive
--Dealing with fanning and non-linearity in model 
-
-
+Questions for Brianna!!!
+-How do we deal with fanning in our models/graphs/residuals? We haven't been able to get rid of them by using transformations. 
+-Given that only 1 of our variables ends up being significant for the models of life expectancy ratio and difference, should we take some time to look for more data/variables?
 
