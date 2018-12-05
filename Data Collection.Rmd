@@ -217,11 +217,8 @@ inputted_gapminder %>%
    ggpairs(columns=3:11)
 ```
 
-
+Model for 2005 predicting life expectancy difference
 ```{r}
-names(joined_Gapminder_tables)
-
-
 lm.numerical<-inputted_gapminder %>% 
    filter(year==2005) %>% 
    lm(life_expectancy_diff~contraceptive_use_percent_of_women_ages_15_49+
@@ -248,6 +245,303 @@ inputted_gapminder%>%
    geom_hline(yintercept = 0)+
    labs(x="Fitted Values", y="Residuals")
 ```
+
+
+Model for 2005 predicting life expectancy ratio
+```{r}
+lm.numerical<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   lm(life_expectancy_ratio~contraceptive_use_percent_of_women_ages_15_49+
+                     males_aged_15plus_unemployment_rate_percent+
+                     females_aged_15plus_unemployment_rate_percent+
+                     ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.numerical)
+```
+
+```{r, fig.width=10, fig.height=10}
+avPlots(lm.numerical)
+```
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   augment(lm.numerical, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+Model for 2005 predicting absolute female life expectancy 
+```{r}
+lm.numerical<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49+
+                     males_aged_15plus_unemployment_rate_percent+
+                     females_aged_15plus_unemployment_rate_percent+
+                     ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.numerical)
+```
+
+```{r, fig.width=10, fig.height=10}
+avPlots(lm.numerical)
+```
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   augment(lm.numerical, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+Model for 2005 predicting absolute male life expectancy
+```{r}
+lm.numerical<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   lm(life_expectancy_male~contraceptive_use_percent_of_women_ages_15_49+
+                     males_aged_15plus_unemployment_rate_percent+
+                     females_aged_15plus_unemployment_rate_percent+
+                     ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.numerical)
+```
+
+```{r, fig.width=10, fig.height=10}
+avPlots(lm.numerical)
+```
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   augment(lm.numerical, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+
+Contraceptive use is a good predictor of both mens and womens life expectency, while education ratio is a predictor only for female life expectancy
+
+
+Model for 2005 predicting life expectancy ratio
+```{r}
+lm.numerical_ratio<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   lm(life_expectancy_ratio~contraceptive_use_percent_of_women_ages_15_49+
+                     males_aged_15plus_unemployment_rate_percent+
+                     females_aged_15plus_unemployment_rate_percent+
+                     ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.numerical_ratio)
+```
+
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   augment(lm.numerical_ratio, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+Reducing Variables
+```{r}
+lm.small_ratio<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   lm(life_expectancy_ratio~
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.small_ratio)
+anova(lm.small_ratio, lm.numerical_ratio)
+
+AIC(lm.small_ratio)
+AIC(lm.numerical_ratio)
+
+BIC(lm.small_ratio)
+BIC(lm.numerical_ratio)
+```
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   augment(lm.small_ratio, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+```{r}
+inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   ggplot(aes(x=mean_years_in_school_women_percent_men_25_to_34_years, y=life_expectancy_female))+
+   geom_point()
+```
+
+
+
+#Slimming model for life expectancy difference
+Model for 2005 predicting life expectancy differnce
+```{r}
+names(inputted_gapminder)
+
+
+lm.numerical_diff<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   lm(life_expectancy_diff~contraceptive_use_percent_of_women_ages_15_49+
+                     males_aged_15plus_unemployment_rate_percent+
+                     females_aged_15plus_unemployment_rate_percent+
+                     ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.numerical_diff)
+```
+
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   augment(lm.numerical_diff, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+Reducing Variables
+```{r}
+lm.small_diff<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   lm(life_expectancy_diff~
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.small_diff)
+anova(lm.small_diff, lm.numerical_diff)
+
+AIC(lm.small_diff)
+AIC(lm.numerical_diff)
+
+BIC(lm.small_diff)
+BIC(lm.numerical_diff)
+```
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   augment(lm.small_diff, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+```{r}
+inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   ggplot(aes(x=mean_years_in_school_women_percent_men_25_to_34_years, y=life_expectancy_diff))+
+   geom_point()
+```
+
+#Slimming model for absolute life expectency female
+Model for 2005 predicting life expectancy
+```{r}
+lm.numerical_female<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   lm(life_expectancy_female~contraceptive_use_percent_of_women_ages_15_49+
+                     males_aged_15plus_unemployment_rate_percent+
+                     females_aged_15plus_unemployment_rate_percent+
+                     ratio_of_girls_to_boys_in_primary_and_secondary_education_perc+
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.numerical_female)
+```
+
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   augment(lm.numerical_female, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+Reducing Variables
+```{r}
+lm.small_female<-inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   lm(life_expectancy_female~
+                     contraceptive_use_percent_of_women_ages_15_49+
+                     mean_years_in_school_women_percent_men_25_to_34_years,
+                  data=.)
+
+
+summary(lm.small_female)
+anova(lm.small_female, lm.numerical_female)
+
+AIC(lm.small_female)
+AIC(lm.numerical_female)
+
+BIC(lm.small_female)
+BIC(lm.numerical_female)
+```
+
+```{r}
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   augment(lm.small_female, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+```
+
+```{r}
+inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   na.omit() %>% 
+   ggplot(aes(x=mean_years_in_school_women_percent_men_25_to_34_years, y=life_expectancy_female))+
+   geom_point()
+```
+
+
 
 Model building plan:
 -Look into interaction terms using model comparison tests
