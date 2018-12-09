@@ -22,6 +22,7 @@ library(car)
 library(tidyr)
 library(qqplotr)
 library(GGally)
+
 ```
 
 
@@ -515,6 +516,52 @@ inputted_gapminder %>%
    na.omit() %>% 
    ggplot(aes(x=mean_years_in_school_women_percent_men_25_to_34_years, y=life_expectancy_female))+
    geom_point()
+```
+
+
+
+Maps of Residuals for the 3 models (female, difference, ratio)
+
+```{r, fig.width=10, fig.height=6}
+female_model_map<-inputted_gapminder %>%
+   filter(year==2005) %>% 
+   na.omit() %>%  
+   augment(lm.small_female, data=.) %>% 
+   full_join(countries, by=c("country"="NAME")) 
+
+
+female_model_map %>% 
+   ggplot() +
+   scale_fill_viridis("Female life expectancy residuals")+
+   geom_sf(aes(fill = .resid)) +
+   ggtitle("Model Residuals Female Life Expectancy 2005")
+   
+
+difference_model_map<-inputted_gapminder %>%
+   filter(year==2005) %>% 
+   na.omit() %>%  
+   augment(lm.small_diff, data=.) %>% 
+   full_join(countries, by=c("country"="NAME")) 
+
+
+difference_model_map %>% 
+   ggplot() +
+   scale_fill_viridis("Life expectancy difference residuals")+
+   geom_sf(aes(fill = .resid)) +
+   ggtitle("Model Residuals Life Expectancy Difference 2005")
+
+ratio_model_map<-inputted_gapminder %>%
+   filter(year==2005) %>% 
+   na.omit() %>%  
+   augment(lm.small_ratio, data=.) %>% 
+   full_join(countries, by=c("country"="NAME")) 
+
+
+ratio_model_map %>% 
+   ggplot() +
+   scale_fill_viridis("Life expectancy ratio residals")+
+   geom_sf(aes(fill = .resid)) +
+   ggtitle("Model Residuals Female Life Expectancy 2005")
 ```
 
 
