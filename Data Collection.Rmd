@@ -194,6 +194,43 @@ inputted_gapminder %>%
    ggpairs(columns=3:11)
 ```
 
+
+
+```{r}
+names(inputted_gapminder)
+
+inputted_gapminder %>% 
+   na.omit() %>% 
+   filter(year==2005) %>% 
+   ggplot(aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_ratio)) +
+   geom_point()
+
+inputted_gapminder %>% 
+   na.omit() %>% 
+   filter(year==2005) %>% 
+   ggplot(aes(x=mean_years_in_school_women_percent_men_25_to_34_years, y=life_expectancy_ratio)) +
+   geom_point()
+
+inputted_gapminder %>% 
+   na.omit() %>% 
+   filter(year==2005) %>% 
+   ggplot(aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_ratio)) +
+   geom_point()
+
+inputted_gapminder %>% 
+   na.omit() %>% 
+   filter(year==2005) %>% 
+   ggplot(aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_ratio)) +
+   geom_point()
+
+inputted_gapminder %>% 
+   na.omit() %>% 
+   filter(year==2005) %>% 
+   ggplot(aes(x=contraceptive_use_percent_of_women_ages_15_49, y=life_expectancy_ratio)) +
+   geom_point()
+```
+
+
 Model for 2005 predicting life expectancy difference
 ```{r}
 lm.numerical<-inputted_gapminder %>% 
@@ -205,6 +242,7 @@ lm.numerical<-inputted_gapminder %>%
                      mean_years_in_school_women_percent_men_25_to_34_years,
                   data=.)
 
+confint(lm.numerical, "mean_years_in_school_women_percent_men_25_to_34_years")
 
 summary(lm.numerical)
 ```
@@ -235,7 +273,7 @@ lm.numerical<-inputted_gapminder %>%
                      mean_years_in_school_women_percent_men_25_to_34_years,
                   data=.)
 
-
+confint(lm.numerical, "mean_years_in_school_women_percent_men_25_to_34_years")
 summary(lm.numerical)
 ```
 
@@ -264,7 +302,8 @@ lm.numerical<-inputted_gapminder %>%
                      mean_years_in_school_women_percent_men_25_to_34_years,
                   data=.)
 
-
+confint(lm.numerical,"contraceptive_use_percent_of_women_ages_15_49")
+confint(lm.numerical, "mean_years_in_school_women_percent_men_25_to_34_years")
 summary(lm.numerical)
 ```
 
@@ -563,6 +602,48 @@ ratio_model_map %>%
    geom_sf(aes(fill = .resid)) +
    ggtitle("Model Residuals Female Life Expectancy 2005")
 ```
+
+```{r, fig.width=10, fig.height=6}
+female_model_map_large<-inputted_gapminder %>%
+   filter(year==2005) %>% 
+   na.omit() %>%  
+   augment(lm.numerical_female, data=.) %>% 
+   full_join(countries, by=c("country"="NAME"))
+
+female_model_map_large %>% 
+   ggplot() +
+   scale_fill_viridis("Female life expectancy predictions")+
+   geom_sf(aes(fill = .fitted)) +
+   ggtitle("Model Predictions Female Life Expectancy 2005")
+
+diff_model_map_large<-inputted_gapminder %>%
+   filter(year==2005) %>% 
+   na.omit() %>%  
+   augment(lm.numerical_diff, data=.) %>% 
+   full_join(countries, by=c("country"="NAME"))
+
+diff_model_map_large %>% 
+   ggplot() +
+   scale_fill_viridis("Life expectancy difference predictions")+
+   geom_sf(aes(fill = .fitted)) +
+   ggtitle("Model Predictions Female Life Expectancy 2005")
+
+
+ratio_model_map_large<-inputted_gapminder %>%
+   filter(year==2005) %>% 
+   na.omit() %>%  
+   augment(lm.numerical_ratio, data=.) %>% 
+   full_join(countries, by=c("country"="NAME"))
+
+ratio_model_map_large %>% 
+   ggplot() +
+   scale_fill_viridis("Life expectancy ratio predictions")+
+   geom_sf(aes(fill = .fitted)) +
+   ggtitle("Model Predictions Female Life Expectancy 2005")
+
+
+```
+
 
 
 
