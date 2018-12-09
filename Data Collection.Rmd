@@ -123,7 +123,7 @@ na_free_inputted<-na.omit(inputted_gapminder)
 library(sf)
 
 
-sfpath<-"Shapefiles\\TM_WORLD_BORDERS-0.3\\TM_WORLD_BORDERS-0.3.shp"
+sfpath<-"Shapefiles/TM_WORLD_BORDERS-0.3/TM_WORLD_BORDERS-0.3.shp"
 
 countries <- st_read(sfpath, quiet = TRUE)
 
@@ -193,6 +193,40 @@ inputted_gapminder %>%
    filter(year==2005) %>% 
    ggpairs(columns=3:11)
 ```
+
+```{r}
+inputted_gapminder %>%
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = contraceptive_use_percent_of_women_ages_15_49, y = life_expectancy_female)) +
+  geom_point()
+
+inputted_gapminder %>%
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = males_aged_15plus_unemployment_rate_percent, y = life_expectancy_female)) +
+  geom_point()
+
+inputted_gapminder %>%  
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = females_aged_15plus_unemployment_rate_percent, y = life_expectancy_female)) +
+  geom_point()
+
+inputted_gapminder %>%  
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = ratio_of_girls_to_boys_in_primary_and_secondary_education_perc, y = life_expectancy_female)) +
+  geom_point()
+
+inputted_gapminder %>%  
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = mean_years_in_school_women_percent_men_25_to_34_years, y = life_expectancy_female)) +
+  geom_point()
+```
+
+
 
 Model for 2005 predicting life expectancy difference
 ```{r}
