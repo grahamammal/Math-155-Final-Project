@@ -174,14 +174,14 @@ sf_inputted %>%
 sf_inputted %>% 
    filter(year==2005) %>% 
    ggplot() +
-   scale_fill_viridis("Female life expectancy")+
+   scale_fill_viridis("Difference Between Male and Female Life Expectancy")+
    geom_sf(aes(fill = life_expectancy_diff)) +
    ggtitle("Life Expectancy Difference 2005")
 
 sf_inputted %>% 
    filter(year==2005) %>% 
    ggplot() +
-   scale_fill_viridis("Female life expectancy")+
+   scale_fill_viridis("Ratio of Male and Female Life Expectancy")+
    geom_sf(aes(fill = life_expectancy_ratio)) +
    ggtitle("Life Expectancy Ratio 2005")
 ```
@@ -226,6 +226,37 @@ inputted_gapminder %>%
   geom_point()
 ```
 
+```{r}
+inputted_gapminder %>%
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = contraceptive_use_percent_of_women_ages_15_49, y = life_expectancy_diff)) +
+  geom_point()
+
+inputted_gapminder %>%
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = males_aged_15plus_unemployment_rate_percent, y = life_expectancy_diff)) +
+  geom_point()
+
+inputted_gapminder %>%  
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = females_aged_15plus_unemployment_rate_percent, y = life_expectancy_diff)) +
+  geom_point()
+
+inputted_gapminder %>%  
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = ratio_of_girls_to_boys_in_primary_and_secondary_education_perc, y = life_expectancy_diff)) +
+  geom_point()
+
+inputted_gapminder %>%  
+  filter(year==2005) %>%
+  na.omit() %>% 
+  ggplot(aes(x = mean_years_in_school_women_percent_men_25_to_34_years, y = life_expectancy_diff)) +
+  geom_point()
+```
 
 
 Model for 2005 predicting life expectancy difference
