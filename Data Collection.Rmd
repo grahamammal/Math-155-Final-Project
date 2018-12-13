@@ -660,6 +660,7 @@ Questions for Brianna!!!
 
 lm.trans.diff<-inputted_gapminder %>% 
    filter(year==2005) %>% 
+   na.omit() %>% 
    lm((life_expectancy_diff)^(-1/3)~ (mean_years_in_school_women_percent_men_25_to_34_years), data=.)
 
 inputted_gapminder %>% 
@@ -668,25 +669,23 @@ inputted_gapminder %>%
    geom_point()
 
 
-lm.diff<-inputted_gapminder %>% 
-   filter(year==2005) %>% 
-   lm((life_expectancy_diff)~ (mean_years_in_school_women_percent_men_25_to_34_years), data=.)
-summary(lm.diff)
+
 summary(lm.trans.diff)
+
+confint(lm.trans.diff, "mean_years_in_school_women_percent_men_25_to_34_years")
 
 inputted_gapminder%>% 
    filter(year==2005) %>% 
+   na.omit()
    augment(lm.trans.diff, data=.) %>% 
    ggplot(aes(x=.fitted, y=.resid))+
    geom_point()+
    geom_hline(yintercept = 0)+
    labs(x="Fitted Values", y="Residuals")
 
+difftestdata<-data.frame(mean_years_in_school_women_percent_men_25_to_34_years=c(90,100,110))
 
-inputted_gapminder%>% 
-   filter(year==2005) %>% 
-   augment(lm.trans.diff, data=.) %>% 
-   filter(.resid>.4)
+predict(lm.trans.diff, difftestdata)^-3   
 ```
 
 ```{r}
