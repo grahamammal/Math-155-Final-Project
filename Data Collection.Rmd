@@ -696,3 +696,31 @@ predict(lm.trans.diff, testdata)^-3
 ```
 
 
+##Models using all available data for 2005
+```{r}
+
+soviet_countries<-data.frame(country=c("Armenia","Azerbaijan","Belarus","Estonia","Georgia","Kazakhstan","Kyrgyzstan","Latvia","Lithuania","Republic of Moldova","Russia","Tajikistan","Turkmenistan","Ukraine","Uzbekistan"))
+
+
+lm.ratio<-
+   inputted_gapminder %>% 
+   filter(year==2005) %>% 
+   lm(life_expectancy_ratio~mean_years_in_school_women_percent_men_25_to_34_years,.)
+
+summary(lm.ratio)
+
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   augment(lm.ratio, data=.) %>% 
+   ggplot(aes(x=.fitted, y=.resid))+
+   geom_point()+
+   geom_hline(yintercept = 0)+
+   labs(x="Fitted Values", y="Residuals")
+
+inputted_gapminder%>% 
+   filter(year==2005) %>% 
+   augment(lm.ratio, data=.) %>% 
+   filter(.resid>.075)
+
+```
+
